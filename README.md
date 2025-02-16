@@ -1,0 +1,1 @@
+This repository provides the scripts and original figure files corresponding to the archived manuscript [A Novel Quantitative Metric Based on a Complete and Unique Characterization of Neural Network Activity: 4D Shannon's Entropy](https://www.biorxiv.org/content/10.1101/2023.09.15.557974v1)
