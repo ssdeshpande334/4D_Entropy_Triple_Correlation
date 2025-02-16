@@ -3,11 +3,12 @@ clearvars
 close all
 clc
 
+% SCRIPT FOR FIGURES 6-7
+
 load batch1_variables_rat_cortical_cultures.mat
 load batch2_variables_rat_cortical_cultures.mat
  
 % two 4D variables, A and B, both of size 12x35x30x14
-% Concatenate them along the 3rd dimension (to make it 60 in size)
 A = all_AT_batch1;
 B = all_AT_batch2;
 
@@ -31,11 +32,11 @@ rat_entropy_4d_network = mean(conc_entropy_4d_network,3,'omitnan');
 figure;
 hold on
 set(gca,'fontsize',30)
-boxplot(rat_entropy_4d_network,'Colors','r')
+boxplot(rat_entropy_4d_network,'Colors','g')
 ylabel({'4D Network Entropy'})
 xlabel('Days{\it in vitro}')
 ylim([0 20])
-title('Figure 3E')
+title('Figure 6E')
 %% compute the spike rate and plot it
 % Assuming 'average_result' is your 4D variable of size 12x35x1x14
 % Create 14 separate variables
@@ -65,7 +66,7 @@ set(gca,'fontsize',30)
 boxplot((actual_variable1*numel(snippet_raster))./64,'Colors','r')
 ylabel({'Spike rate (spikes/s)'})
 xlabel('Days{\it in vitro}')
-title('Figure 3B')
+title('Figure 6B')
 
 % plot motif class V A/T
 figure;
@@ -76,13 +77,13 @@ yline(0,'k')
 ylim([-1 1.5])
 ylabel({'Motif Class V'})
 xlabel('Days{\it in vitro}')
-title('Figure 3D')
+title('Figure 6D')
 
 %%
 ymax = 40;
 figure; 
 hold on
-sgtitle('Figure 3F - top row')
+sgtitle('Figure 7 - top row')
 subplot(1,7,1)
 hold on;
 A = AT_variable1;
@@ -165,7 +166,7 @@ plot(med,'b','linewidth',4)
 ymax = 8;
 figure;
 hold on
-sgtitle('Figure 3F - bottom row')
+sgtitle('Figure 7 - bottom row')
 subplot(1,7,1)
 hold on;
 A = AT_variable8;

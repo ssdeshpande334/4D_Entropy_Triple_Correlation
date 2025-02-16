@@ -1,4 +1,4 @@
-%% Script for Figure 2 of 4D Entropy Paper
+%% Script for Figure 3 of 4D Entropy Paper
 
 clearvars
 close all
@@ -43,7 +43,7 @@ for k=1:size(raster,1);
 end;
 xlabel('Time')
 ylabel('Neuron #')
-title('Figure 2A Raster: Feedforward (Motif Class XIII)','fontsize',40)
+title('Figure 3A Raster: Feedforward (Motif Class XIII)','fontsize',40)
 axis off
 box off
 
@@ -54,7 +54,7 @@ box off
 % xlabel('Time bin #')
 % ylabel('Neuron #')
 
-%
+
 post_end = 0;
 slice_start = post_end+1;
 
@@ -70,14 +70,15 @@ post_end = snip_end+1+max_time_lag-1;
 temp_snippet = cat(2,pre_snippet_raster, snippet_raster, post_snippet_raster);
 
 size(temp_snippet)
+temp_snippet = raster;
 [N_neurons, N_times] = size(temp_snippet);
 
 %compute tricorr
 [c3_4D_distribution, actual_contribution,class_count,contribution]= ...
     triple_correlation_class_contributions_no_sp_wr(temp_snippet, neuron_window, time_window);
 
-actual = actual_contribution./(numel(snippet_raster));
-[conditioned_expectation] = expectation_conditioned_on_constituent_parts_2D(actual, snippet_raster,neuron_window, time_window);
+actual = actual_contribution./(numel(temp_snippet));
+[conditioned_expectation] = expectation_conditioned_on_constituent_parts_2D(actual, temp_snippet,neuron_window, time_window);
 
 aovert_minus1 = (actual ./conditioned_expectation ) -1;
 
@@ -100,7 +101,7 @@ h.FontSize = 40;
 colormap("parula")
 xlabel('temporal lag, t_1')
 ylabel('spatial lag, n_1')
-title({'Figure 2E'})
+title({'Figure 3C'})
 for i = 1:numel(h.XDisplayLabels)
     h.XDisplayLabels{i} = str2num(h.XDisplayLabels{i}) - ((time_window/2) + 1);
 end
@@ -108,22 +109,6 @@ for i = 1:numel(h.YDisplayLabels)
     h.YDisplayLabels{i} = str2num(h.YDisplayLabels{i}) - ((neuron_window/2) + 1);
 end
 clim([0 0.35])
-
-figure;
-h = heatmap(c3_n1t1_distribution); %,'CellLabelColor','none');
-h.FontSize = 40;
-%h.GridVisible = 'off';
-colormap("parula")
-xlabel('temporal lag, t_1')
-ylabel('spatial lag, n_1')
-title({'Figure 2C'})
-for i = 1:numel(h.XDisplayLabels)
-    h.XDisplayLabels{i} = str2num(h.XDisplayLabels{i}) - ((time_window/2) + 1);
-end
-for i = 1:numel(h.YDisplayLabels)
-    h.YDisplayLabels{i} = str2num(h.YDisplayLabels{i}) - ((neuron_window/2) + 1);
-end
-
 
 %Compute the 4D Entropy
 bins_4d = [neuron_window+1 time_window+1 neuron_window+1 time_window+1];
@@ -211,7 +196,7 @@ for k=1:size(noise_raster{1,1},1);
 end;
 xlabel('Time')
 ylabel('Neuron #')
-title('Figure 2B Surrogate Raster','fontsize',40)
+title('Figure 3B Surrogate Raster','fontsize',40)
 axis off
 box off
 %%
@@ -223,7 +208,7 @@ h.CellLabelFormat = '%.3f';
 colormap("parula")
 xlabel('temporal lag, t_1')
 ylabel('spatial lag, n_1')
-title({'Figure 2F Surrogate PDF'})
+title({'Figure 3D Surrogate PDF'})
 for i = 1:numel(h.XDisplayLabels)
     h.XDisplayLabels{i} = str2num(h.XDisplayLabels{i}) - ((time_window/2) + 1);
 end
@@ -232,40 +217,57 @@ for i = 1:numel(h.YDisplayLabels)
 end
 clim([0 0.35])
 
-%
-figure;
-h = heatmap(mean(c3_n1t1_noise_distribution,3)); %CellLabelColor','none');
-h.CellLabelFormat = '%.1f';
-h.FontSize = 40;
-%h.GridVisible = 'off';
-colormap("parula")
-%title('2D histogram: n1 & t1 lags')
-xlabel('temporal lag, t_1')
-ylabel('spatial lag, n_1')
-title({'Figure 2D Surrogate Average Distribution'})
-for i = 1:numel(h.XDisplayLabels)
-    h.XDisplayLabels{i} = str2num(h.XDisplayLabels{i}) - ((time_window/2) + 1);
+%% compute the maximum entropy (based on a uniform distribution)
+% Define the ranges for each dimension
+n_range = -(neuron_window/2):(neuron_window/2); 
+t_range = -(time_window/2):(time_window/2);
+
+% Determine the sizes of the dimensions
+n1 = length(n_range); 
+n2 = length(n_range); 
+t1 = length(t_range); 
+t2 = length(t_range); 
+
+% Calculate the total number of elements in the 4D array
+total_elements = n1 * n2 * t1 * t2;
+
+% Calculate the uniform probability for each element
+uniform_probability = 1 / total_elements;
+
+% Initialize the 4D array with uniform probabilities
+PDF_uniform_4d = ones(n1, t1, n2, t2) * uniform_probability;
+
+% Verify that the sum of all probabilities is 1
+sum_probabilities = sum(PDF_uniform_4d(:)); 
+
+%Compute the 4D maximum Entropy
+bins_4d = [neuron_window+1 time_window+1 neuron_window+1 time_window+1];
+entropy_maximum_4d = 0;
+
+for i=1:bins_4d(1)
+    for j=1:bins_4d(2)
+        for k = 1:bins_4d(3)
+            for m = 1:bins_4d(4)
+                temp_4d = PDF_uniform_4d;
+                if temp_4d(i,j,k,m)~=0        
+                    entropy_maximum_4d=entropy_maximum_4d-temp_4d(i,j,k,m)*log2(temp_4d(i,j,k,m));       
+                end
+            end
+        end
+
+    end
 end
-for i = 1:numel(h.YDisplayLabels)
-    h.YDisplayLabels{i} = str2num(h.YDisplayLabels{i}) - ((neuron_window/2) + 1);
-end
+
 
 %% plot the entropies
 figure;
 hold on
 set(0,'defaultAxesFontSize',30)
-sgtitle('Figure 2G')
 
-subplot(1,4,[1 2])
 hold on;
-X = categorical({'Raster'});
-X = reordercats(X,{'Raster'});
-b = bar(X,entropy_raster_4d);
-ylabel('4D Entropy')
+boxplot(entropy_raster_4d,'Colors','r')
+boxplot(entropy_noise_4d,'Colors','b')
+boxplot(entropy_maximum_4d,'Colors','g')
 ylim([0 15])
-
-subplot(1,4,[3 4])
-hold on;
-boxplot(entropy_noise_4d)
-ylim([0 15])
-
+title('Figure 3E (Network: red, surrogate: blue, uniform/maximum: green)')
+ylabel('4D entropy')

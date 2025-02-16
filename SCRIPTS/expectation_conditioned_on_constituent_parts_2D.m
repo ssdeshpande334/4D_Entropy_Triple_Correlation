@@ -1,6 +1,6 @@
 function [super_noise] = expectation_conditioned_on_constituent_parts_2D(actual, raster,neuron_window, time_window)
      
-    [expected,unscaled_expected, p] = theoretical_expectation_2D(raster, neuron_window, time_window)
+    [expected,unscaled_expected, p] = theoretical_expectation_2D(raster, neuron_window, time_window);
     
      super_noise = [
     
